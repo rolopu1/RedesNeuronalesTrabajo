@@ -20,8 +20,9 @@ for i in range(10):
         Audio = Audio.reset_index(drop=True)
         for k in range(Audio.shape[0]):
             plt.plot(Audio.loc[k,'sound'])
-            plt.ylim([-1,1])
+            # plt.ylim([-1,1])
+
             plt.savefig(gaddress+"Clase"+str(i)+"iD"+str(j)+"order"+str(k)+".png")
-            
             plt.close()
+
 print('Fin')
