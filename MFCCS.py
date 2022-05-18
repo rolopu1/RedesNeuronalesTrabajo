@@ -19,5 +19,5 @@ for j in A['iD'].unique():
         s = Audio.loc[k,'sound']
         mfccs = librosa.feature.mfcc(y=s, sr=48000, n_mfcc = 40)
 
-        plt.savefig(gaddress+'MFCCs/'+str(j)+'_'+str(k)+'.png')
+
 # %%
