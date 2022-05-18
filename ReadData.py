@@ -4,13 +4,13 @@ import os
 import pandas as pd
 from scipy.io import wavfile
 
-datapath = "E:/RODRIGO/UNI/Master/RedesNeuronales/Trabajo/UrbanSound8K/audio"
-Data = pd.DataFrame()
+datapath = "C:/Master/RedesNeuronales/Trabajo/UrbanSound8K/audio/"
+Data = pd.DataFrame(columns={'sound','duration','class','slice','fold','iD'})
 
 
 def obtener_audio():
     ruta = ruta[1:-1] # para eliminar los paréntesis del nombre
-    x, sample_rate = librosa.load(os.path.join(folder,file), sr=None)
+    x, sample_rate = librosa.load(os.path.join(folder,file), sr=48000)
     return pd.Series(x for x in x)
 
 for i in np.arange(1,10):
@@ -29,10 +29,12 @@ for i in np.arange(1,10):
             aux['fold'] = str(i)
             aux['iD'] = file[:file.find('-')]
 
-            Data = Data.append(aux.iloc[0,:])
-    if i == 1 or i==2 or i==3:
-        Data = Data.reset_index(drop=True)
-        Data.to_pickle(datapath+'/Sound'+str(i)+'.pkl')
+            Data = pd.concat([Data,aux])
+            
+    Data = Data[Data.index ==0]
+    # if i == 1 or i==2 or i==3:
+        # Data = Data.reset_index(drop=True)
+        #Data.to_pickle(datapath+'/Sound'+str(i)+'.pkl')
 
 Data = Data.reset_index(drop=True)
 Data.to_pickle(datapath+'/AllSound.pkl')
