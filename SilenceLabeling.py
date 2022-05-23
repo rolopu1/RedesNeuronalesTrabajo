@@ -8,15 +8,15 @@ from scipy.fft import fftshift
 import librosa
 #%% Read Data
 datapath = "C:/Master/RedesNeuronales/Trabajo/UrbanSound8K/audio/"
-gaddress = "C:/Master/RedesNeuronales/Trabajo/Graficas/"
+gaddress = "C:/Master/RedesNeuronales/Trabajo/Graficas/Mel40/"
 A = pd.read_pickle(datapath+'AllSound.pkl')  #AllSound
 fs = 48000
 A = A[A['duration']>=0.1]
 print('leido')
 Todo = pd.DataFrame()
-plot = False
+plot = True
 #%% Separate data
-for i in range(10):
+for i in range(10): 
     Clase = A[A['class']==str(i)]
     print(i)
     for j in Clase['iD'].unique():#['162540']:#
@@ -29,7 +29,8 @@ for i in range(10):
             var = 1/np.max(np.abs([np.max(Audio.loc[k,'sound']),np.min(Audio.loc[k,'sound'])]))
             norm = Audio.loc[k,'sound'] * var
             w = signal.get_window('hamming',4800,True)
-            Sxx = librosa.feature.melspectrogram(norm,sr= fs, n_fft = 4800, win_length=4800, hop_length=3600)
+            Sxx = librosa.feature.melspectrogram(norm,sr= fs, n_fft = 4800, win_length=4800, hop_length=3600, n_mels = 128)
+            # Sxx = librosa.feature.mfcc(norm, sr = 48000, n_mfcc=40,window = w)
             # print(Sxx.shape)
             Datos = pd.DataFrame(Sxx.T)
             Datos['duration'] = Audio.loc[k,'duration']
@@ -37,7 +38,7 @@ for i in range(10):
             Datos['slice'] = Audio.loc[k,'slice']
             Datos['fold'] = Audio.loc[k,'fold']  
             Datos['class'] = Audio.loc[k,'class']  
-            lim = np.max(Sxx)/100
+            lim = np.max(Sxx)/33
             for fi in range(Sxx.shape[1]):
                 # print(np.max(Sxx[:,fi]))
                 if(np.max(Sxx[:,fi])<lim):
@@ -66,5 +67,5 @@ for i in range(10):
 
                 # plt.show()
                 plt.close()
-Todo.to_pickle(datapath+"TodoAudios_MelSpectrogram.pkl")
+Todo.to_pickle(datapath+"TodoAudios_Mel128.pkl")
 print('Fin')

@@ -13,14 +13,14 @@ def obtener_audio():
     x, sample_rate = librosa.load(os.path.join(folder,file), sr=48000)
     return pd.Series(x for x in x)
 
-for i in np.arange(1,10):
+for i in np.arange(1,11):
     folder = os.path.join(datapath,"fold"+str(i))
 
     print(i)
     for file in os.listdir(folder):
         aux = pd.DataFrame()
         if file.endswith('.wav'):
-            w= librosa.load(os.path.join(folder,file),sr=None)
+            w= librosa.load(os.path.join(folder,file),sr=48000)
 
             aux['sound'] = w
             aux['duration'] = w[0].shape[0]/48000

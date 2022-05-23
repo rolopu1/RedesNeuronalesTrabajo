@@ -26,12 +26,12 @@ print('leido')
 
 #%%
 
-KNNmodel = KNeighborsClassifier(n_neighbors=10)
+KNNmodel = KNeighborsClassifier(n_neighbors=2)
 linDis = LinearDiscriminantAnalysis()
 Logreg = LogisticRegression(max_iter=1000)
 svm = SVC()
 gNB = GaussianNB()
-RanF = RandomForestClassifier(n_estimators=50, random_state=1)
+RanF = RandomForestClassifier(n_estimators=2, random_state=1)
 AdaB = AdaBoostClassifier()
 
 classifiers = [ KNNmodel,linDis,Logreg,svm,gNB,RanF,AdaB]
@@ -39,7 +39,7 @@ labelclass = ['KNN','LinDis', 'LogReg','SVM','gNB','RanF','AdaB']
 # VotingClassifier()
 
 #%%
-pca = PCA(0.95)
+pca = PCA(0.8)
 
 #%%Scores
 Scores = pd.DataFrame(columns=labelclass)
@@ -65,24 +65,29 @@ for i in np.arange(1,9):
     x_test = pca.transform(x_test)
     y_test = Test.loc[:,'class'].astype(int)
 
-
+    print(x_test.shape)
+    print(x_train.shape)
 
     for c,cl in zip(classifiers,labelclass):
+        print(cl)
         c.fit(x_train,y_train)
         pred = c.predict(x_test)
         cm = confusion_matrix(y_test,pred,normalize='true')
         p.append(precision_score(y_test,pred,average='macro'))
         a.append(accuracy_score(y_test,pred))
         r.append(recall_score(y_test,pred,average='macro'))
+        # print("precision {0}, accuracy {0}, recall {0}".format(np.round(p,3),np.round(a,3),np.round(r,3)))
+        print(p)
+        print(a)
+        print(r)
+        Scores = pd.concat([Scores,pd.DataFrame([p,a,r])])
 
-    Scores = pd.concat([Scores,pd.DataFrame([p,a,r])])
-
-    ax = sns.heatmap(np.round(cm,3)*100, annot=True, cmap='Blues')
-    ax.set_xlabel('Predicted Category')
-    ax.set_ylabel('Actual Category ')
-    # plt.show()
-    plt.savefig(gaddress+"ConfMat_Test_"+str(i)+".png")
-    plt.close()
+        ax = sns.heatmap(np.round(cm,3)*100, annot=True, cmap='Blues')
+        ax.set_xlabel('Predicted Category')
+        ax.set_ylabel('Actual Category ')
+        # plt.show()
+        plt.savefig(gaddress+"ConfMat_Test_"+str(i)+cl+".png")
+        plt.close()
 
 
 
