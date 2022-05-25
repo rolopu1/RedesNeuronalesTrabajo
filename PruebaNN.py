@@ -16,9 +16,12 @@ import keras.optimizers
 #%% Read Data
 datapath = "C:/Master/RedesNeuronales/Trabajo/UrbanSound8K/audio/"
 gaddress = "C:/Master/RedesNeuronales/Trabajo/Graficas/"
-A = pd.read_pickle(datapath+'TodoAudios_Mel64.pkl')
+A = pd.read_pickle(datapath+'TodoAudios_Mel128.pkl')
 fs = 48000
 print('leido')
+
+#%%
+
 
 #%%
 buenos = np.zeros((10,10))
@@ -28,26 +31,32 @@ for i in np.arange(1,11):
     model = Sequential()
     model.add(Dense(128))
     model.add(Activation('relu'))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.5))
     model.add(Dense(256))
     model.add(Activation('relu'))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.5))
     model.add(Dense(11))
     model.add(Activation('softmax'))
     model.compile(loss='sparse_categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
+    print(i)
 
     Test = A[A['fold']==str(i)]
     Train = A[A['fold']!=str(i)]
-
-    print(i)
-
     scaler = StandardScaler()
-    x_train = scaler.fit_transform(Train.iloc[:,:64])
-    y_train = Train.loc[:,'class'].astype(int)
-    x_test = scaler.fit_transform(Test.iloc[:,:64])
-    y_test = Test.loc[:,'class'].astype(int)
-    batch = 512
-    model.fit(x_train, y_train,epochs = 1, verbose=1,batch_size=batch, validation_batch_size=batch,validation_data=(x_test,y_test))
+    Train.iloc[:,:128] = scaler.fit_transform(Train.iloc[:,:128])
+    Recopilatorio = pd.DataFrame()
+    for ID in Train.iD.unique():
+        aud = Train[Train['iD']==ID]
+        for sli in aud.slice.unique():
+            
+            parte = aud[aud['slice']==sli]
+            for j in range(parte.shape[0]-5):
+                Recopilatorio = pd.concat([Recopilatorio,pd.concat([pd.DataFrame(parte.iloc[j:j+5,:128].to_numpy().flatten()),parte.iloc[j,129:]],ignore_index = True)],ignore_index = True,axis =1)
+    RecopilatorioT = Recopilatorio.T
+    x_train = RecopilatorioT.iloc[:,:128]
+    y_train = parte.loc[:,'class'].astype(int)
+            # print(x_train.shape)
+    model.fit(x_train, y_train,epochs = 1, verbose=1,batch_size=4096)
     # for a in Test
 
     for ID in Test.iD.unique():
@@ -55,7 +64,7 @@ for i in np.arange(1,11):
         for sli in aud.slice.unique():
             
             parte = aud[aud['slice']==sli]
-            x_test = scaler.transform(parte.iloc[:,:64])
+            x_test = scaler.transform(parte.iloc[:,:128])
 
             clases = parte[parte['class']!=10]
             y_true_audio = int(clases.iloc[-1,-1])
@@ -69,7 +78,8 @@ for i in np.arange(1,11):
 
             if (pred[0] == y_true_audio)[0]:
                 buenos[i-1,y_true_audio] = buenos[i-1,y_true_audio] +1
-print(np.sum(buenos/total,axis = 1))
-print(np.mean(np.sum(buenos/total,axis = 1)/10))
-print("fin")
+    print(buenos)
+print(np.mean(buenos/total,axis = 0))
+print(buenos)
+print(total)
 # %%

@@ -13,9 +13,10 @@ A = pd.read_pickle(datapath+'AllSound.pkl')  #AllSound
 fs = 48000
 A = A[A['duration']>=0.1]
 print('leido')
+
+#%% Separate data
 Todo = pd.DataFrame()
 plot = False
-#%% Separate data
 for i in range(10): 
     Clase = A[A['class']==str(i)]
     print(i)
@@ -32,19 +33,20 @@ for i in range(10):
             Sxx = librosa.feature.melspectrogram(norm,sr= fs, n_fft = 4800, win_length=4800, hop_length=3600, n_mels = 128)
             # Sxx = librosa.feature.mfcc(norm, sr = 48000, n_mfcc=40,window = w)
             # print(Sxx.shape)
-            Datos = pd.DataFrame(Sxx.T)
+            mediana = np.median(Sxx.T,axis=0)
+            media = np.mean(Sxx.T,axis=0)
+            varianza = np.var(Sxx.T,axis=0)
+
+            aux= np.concatenate([mediana,media,varianza])
+
+            Datos = pd.DataFrame([aux])
             Datos['duration'] = Audio.loc[k,'duration']
             Datos['iD'] = Audio.loc[k,'iD']
             Datos['slice'] = Audio.loc[k,'slice']
             Datos['fold'] = Audio.loc[k,'fold']  
             Datos['class'] = Audio.loc[k,'class']  
-            lim = np.max(Sxx)/33
-            for fi in range(Sxx.shape[1]):
-                # print(np.max(Sxx[:,fi]))
-                if(np.max(Sxx[:,fi])<lim):
-                    Datos.loc[fi,'class'] = 10
-
             
+
             
             Todo = pd.concat([Todo,Datos])
             if plot:
@@ -67,5 +69,6 @@ for i in range(10):
 
                 # plt.show()
                 plt.close()
-Todo.to_pickle(datapath+"TodoAudios_Mel128.pkl")
+Todo.to_pickle(datapath+"TodoAudios_EstadisticasMel128.pkl")
 print('Fin')
+# %%
