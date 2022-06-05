@@ -32,30 +32,12 @@ for i in range(10):
             w = signal.get_window('hamming',length,True)
             Sxx = librosa.feature.melspectrogram(norm,sr= fs, n_fft = length, win_length=length, hop_length=4800, n_mels = 128)
 
-            Datos = pd.DataFrame(Sxx.T)
-            Datos['duration'] = Audio.loc[k,'duration']
-            Datos['iD'] = Audio.loc[k,'iD']
-            Datos['slice'] = Audio.loc[k,'slice']
-            Datos['fold'] = Audio.loc[k,'fold']  
-            Datos['class'] = Audio.loc[k,'class']  
-            lim = np.max(Sxx)/40
-            for fi in range(Sxx.shape[1]):
-                # print(np.max(Sxx[:,fi]))
-                if(np.max(Sxx[:,fi])<lim):
-                    Datos.loc[fi,'class'] = 10
+            samples =  np.empty((0,Sxx.shape[0],Sxx.shape[1]))
+
+            Datos = pd.DataFrame([Audio.loc[k,'duration'],Audio.loc[k,'iD'],Audio.loc[k,'slice'],Audio.loc[k,'fold'],Audio.loc[k,'class']], columns=['duration','iD','slice','fold','class'])
+       
             
             Todo = pd.concat([Todo,Datos])
-            if plot:
-                clases = Datos['class']
-                plt.subplot(211)
-                plt.plot(np.linspace(0,Audio.loc[k,'duration'],norm.shape[0]),norm)
-                plt.ylabel("Amplitud")
-                plt.subplot(212)
-                plt.pcolormesh(Sxx)#plt.pcolormesh(t, f, Sxx)
-                plt.xlabel("time")
-                plt.ylabel("Mel coeficient")
-                plt.xticks(np.linspace(0,clases.shape[0],clases.shape[0]),clases, rotation = 45)
-                plt.savefig(gaddress+"Clase"+str(i)+"iD"+str(j)+"order"+str(k)+".png")
-                plt.close()
+
 Todo.to_pickle(datapath+"TodoAudios_Mel12848000.pkl")
 print('Fin')

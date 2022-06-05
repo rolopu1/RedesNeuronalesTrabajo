@@ -30,16 +30,17 @@ for i in range(10):
             var = 1/np.max(np.abs([np.max(Audio.loc[k,'sound']),np.min(Audio.loc[k,'sound'])]))
             norm = Audio.loc[k,'sound'] * var
             w = signal.get_window('hamming',4800,True)
-            Sxx = librosa.feature.melspectrogram(norm,sr= fs, n_fft = 4800, win_length=4800, hop_length=3600, n_mels = 128)
-            # Sxx = librosa.feature.mfcc(norm, sr = 48000, n_mfcc=40,window = w)
+            # Sxx = librosa.feature.melspectrogram(norm,sr= fs, n_fft = 4800, win_length=4800, hop_length=3600, n_mels = 128)
+            Sxx = librosa.feature.mfcc(norm, sr = 48000, n_mfcc=40)
             # print(Sxx.shape)
-            mediana = np.median(Sxx.T,axis=0)
-            media = np.mean(Sxx.T,axis=0)
-            varianza = np.var(Sxx.T,axis=0)
+            # mediana = np.median(Sxx.T,axis=0)
+            # media = np.mean(Sxx.T,axis=0)
+            # varianza = np.var(Sxx.T,axis=0)
 
-            aux= np.concatenate([mediana,media,varianza])
+            # aux= np.concatenate([mediana,media,varianza])
 
-            Datos = pd.DataFrame([aux])
+            Datos = pd.DataFrame()
+            Datos['mfcc'] = Sxx.T
             Datos['duration'] = Audio.loc[k,'duration']
             Datos['iD'] = Audio.loc[k,'iD']
             Datos['slice'] = Audio.loc[k,'slice']

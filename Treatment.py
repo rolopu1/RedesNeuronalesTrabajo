@@ -3,9 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 #%% Read Data
-datapath = "E:/RODRIGO/UNI/Master/RedesNeuronales/Trabajo/UrbanSound8K/audio/"
-gaddress = "E:/RODRIGO/UNI/Master/RedesNeuronales/Trabajo/Graficas/"
-A = pd.read_pickle(datapath+'AllSound')
+datapath = "C:/Master/RedesNeuronales/Trabajo/UrbanSound8K/audio/"
+gaddress = "C:/Master/RedesNeuronales/Trabajo/Graficas/Varios/"
+A = pd.read_pickle(datapath+'AllSound16000.pkl')
 
 print('leido')
 #%% Separate data

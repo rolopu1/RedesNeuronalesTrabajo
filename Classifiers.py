@@ -24,32 +24,38 @@ fs = 48000
 print('leido')
 
 #%%
-
-KNNmodel = KNeighborsClassifier(n)
-linDis = LinearDiscriminantAnalysis()
-Logreg = LogisticRegression(max_iter=1000)
-svm = SVC(C=0.1)
-gNB = GaussianNB()
-RanF = RandomForestClassifier(n_estimators=2, random_state=1)
-AdaB = AdaBoostClassifier()
-
-nombres = ["air_conditioner", "car_horn", "children_playing", "dog_bark", "drilling", "engine_idling", "gun_shot", "jackhammer", "siren", "street_music"]
-classifiers = [ KNNmodel,linDis,Logreg,svm,AdaB]
-labelclass = ['KNN','LinDis', 'LogReg','SVM','AdaB']
-# VotingClassifier()
-ensemble=VotingClassifier(estimators=classifiers,voting='hard',) #soft utiliza probabilidades
-classifiers = [ KNNmodel,linDis,Logreg,svm,gNB,RanF,AdaB,ensemble]
-labelclass = ['KNN','LinDis', 'LogReg','SVM','gNB','RanF','AdaB',"Voting"]
-#%%
-pca = PCA(0.95)
+pca = PCA(0.9)
 d = dict(zip(range(10),["air_conditioner", "car_horn", "children_playing", "dog_bark", "drilling", "engine_idling", "gun_shot", "jackhammer", "siren", "street_music"]))
 #%%Scores
+labelclass = ['KNN','LinDis', 'LogReg','SVM','gNB','RanF','AdaB',"Voting"]
 Scores = pd.DataFrame(columns=labelclass)
 p=np.zeros([10,8])
 a=np.zeros([10,8])
 r=np.zeros([10,8])
 #%% Separate data
 for i in np.arange(1,11):
+    KNNmodel1 = KNeighborsClassifier(n_neighbors=10)
+    linDis1 = LinearDiscriminantAnalysis()
+    Logreg1 = LogisticRegression(max_iter=1000)
+    svm1 = SVC(C=0.1)
+    AdaB1 = AdaBoostClassifier()
+
+    nombres = ["air_conditioner", "car_horn", "children_playing", "dog_bark", "drilling", "engine_idling", "gun_shot", "jackhammer", "siren", "street_music"]
+    classifiers = [ KNNmodel1,linDis1,Logreg1,svm1,AdaB1]
+    labelclass = ['KNN','LinDis', 'LogReg','SVM','AdaB']
+    # VotingClassifier()
+    KNNmodel = KNeighborsClassifier(n_neighbors=10)
+    linDis = LinearDiscriminantAnalysis()
+    Logreg = LogisticRegression(max_iter=1000)
+    svm = SVC(C=0.1)
+    gNB = GaussianNB()
+    RanF = RandomForestClassifier(n_estimators=2, random_state=1)
+    AdaB = AdaBoostClassifier()
+    ensemble=VotingClassifier(estimators=[('lr', Logreg1), ('KNN', KNNmodel1), ('linDis', linDis1), ('svm', svm1),('AdaB',AdaB1)], voting='hard')
+    classifiers = [ KNNmodel,linDis,Logreg,svm,gNB,RanF,AdaB,ensemble]
+    labelclass = ['KNN','LinDis', 'LogReg','SVM','gNB','RanF','AdaB',"Voting"]
+    # classifiers = [ ensemble]
+    # labelclass = ["Voting"]
     Test = A[A['fold']==str(i)]
     Train = A[A['fold']!=str(i)]
 
@@ -78,14 +84,15 @@ for i in np.arange(1,11):
         p[i-1,k] = precision_score(y_test,pred,average='macro')
         a[i-1,k] = accuracy_score(y_test,pred)
         r[i-1,k] = recall_score(y_test,pred,average='macro')
-
+        print(p[i-1,k])
         ax = sns.heatmap(np.round(cm,3)*100, annot=True, cmap='Blues',xticklabels=nombres,yticklabels=nombres)
         ax.set_xlabel('Predicted Category')
         ax.set_ylabel('Actual Category ')
         # plt.show()
+        plt.tight_layout()
         plt.savefig(gaddress+"ConfMat_Test_"+str(i)+cl+".png")
         plt.close()
-    print(p[i-1,:])
+    print(a[i-1,:])
 
 dict
 Scores = pd.DataFrame(p)

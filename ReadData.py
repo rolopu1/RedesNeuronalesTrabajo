@@ -6,11 +6,11 @@ from scipy.io import wavfile
 
 datapath = "C:/Master/RedesNeuronales/Trabajo/UrbanSound8K/audio/"
 Data = pd.DataFrame(columns={'sound','duration','class','slice','fold','iD'})
-
+fs = 16000
 
 def obtener_audio():
     ruta = ruta[1:-1] # para eliminar los paréntesis del nombre
-    x, sample_rate = librosa.load(os.path.join(folder,file), sr=48000)
+    x, sample_rate = librosa.load(os.path.join(folder,file), sr=fs)
     return pd.Series(x for x in x)
 
 for i in np.arange(1,11):
@@ -20,10 +20,10 @@ for i in np.arange(1,11):
     for file in os.listdir(folder):
         aux = pd.DataFrame()
         if file.endswith('.wav'):
-            w= librosa.load(os.path.join(folder,file),sr=48000)
+            w= librosa.load(os.path.join(folder,file),sr=fs)
 
             aux['sound'] = w
-            aux['duration'] = w[0].shape[0]/48000
+            aux['duration'] = w[0].shape[0]/fs
             aux['class'] = file[file.find('-')+1:file.find('-')+2]
             aux['slice'] = file[file.find('-')+5:-4]
             aux['fold'] = str(i)
@@ -37,4 +37,4 @@ for i in np.arange(1,11):
         #Data.to_pickle(datapath+'/Sound'+str(i)+'.pkl')
 
 Data = Data.reset_index(drop=True)
-Data.to_pickle(datapath+'/AllSound.pkl')
+Data.to_pickle(datapath+'/AllSound16000.pkl')
